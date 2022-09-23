@@ -74,8 +74,7 @@ pipeline {
         container('docker-tools') {
           sh "docker build . -t ${APP_NAME}"
         }
-      }
-      stage('Artefact Analysis') {
+        stage('Artefact Analysis') {
       parallel {
         stage('Contianer Scan') {
           steps {
@@ -97,6 +96,8 @@ pipeline {
         }
       }
     }
+      }
+      
     }
     stage('Publish') {
       steps {
