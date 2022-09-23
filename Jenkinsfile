@@ -22,22 +22,20 @@ pipeline {
         }
       }
     }
-    stage('Secrets scanner') {
-          steps {
-            try{
-            container('trufflehog') {
-              sh 'git clone ${GIT_URL}'
-              sh 'cd sample-api-service && ls -al'
-              sh 'cd sample-api-service && trufflehog .'
-              sh 'rm -rf sample-api-service'
-            }
-              
-            }
-            catch (err) {
-                echo 'Trufflehog error....'
-        }
-          }
-        }
+//     stage('Secrets scanner') {
+//           steps {
+//             container('trufflehog') {
+//               git(
+//        url: 'https://github.com/dharshantwrks/sample-api-service/',
+//        credentialsId: '87beede8-7819-4f1b-b35e-4298861304fe',
+//        branch: "main"
+//     )
+//               sh 'cd sample-api-service && ls -al'
+//               sh 'cd sample-api-service && trufflehog .'
+//               sh 'rm -rf sample-api-service'
+//             }
+//           }
+//         }
     stage('Build') {
       steps {
         container('maven') {
@@ -54,6 +52,19 @@ pipeline {
             }
           }
         }
+        stage('SCA - Dependency Checker') {
+            steps {
+              container('maven') {
+                                  sh './mvnw org.owasp:dependency-check-maven:check'
+                }
+            }
+            post {
+              always {
+                archiveArtifacts allowEmptyArchive: true, artifacts: 'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: false
+                dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+              }
+            }
+          }
       }
     }
     stage('Package') {
