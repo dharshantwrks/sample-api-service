@@ -75,6 +75,28 @@ pipeline {
           sh "docker build . -t ${APP_NAME}"
         }
       }
+      stage('Artefact Analysis') {
+      parallel {
+        stage('Contianer Scan') {
+          steps {
+            container('docker-tools') {
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                sh "grype ${APP_NAME}"
+              }
+            }
+          }
+        }
+        stage('Container Audit') {
+          steps {
+            container('docker-tools') {
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                sh "dockle ${APP_NAME}"
+              }
+            }
+          }
+        }
+      }
+    }
     }
     stage('Publish') {
       steps {
