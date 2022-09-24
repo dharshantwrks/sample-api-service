@@ -128,7 +128,9 @@ pipeline {
         stage('Kubesec') {
           steps {
             container('docker-tools') {
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
               sh 'kubesec scan k8s.yaml'
+              }
             }
           }
         }
