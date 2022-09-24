@@ -52,6 +52,20 @@ pipeline {
             }
           }
         }
+        stage('OSS License Checker') {
+             steps {
+               container('licensefinder') {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                   sh '''#!/bin/bash --login
+                         /bin/bash --login
+                         rvm use default
+                         gem install license_finder
+                         license_finder
+                       '''
+                 }
+               }
+             }
+           }
         stage('SCA - Dependency Checker') {
             steps {
               container('maven') {
@@ -69,20 +83,7 @@ pipeline {
           }
       }
     }
-    stage('OSS License Checker') {
-             steps {
-               container('licensefinder') {
-                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                   sh '''#!/bin/bash --login
-                         /bin/bash --login
-                         rvm use default
-                         gem install license_finder
-                         license_finder
-                       '''
-                 }
-               }
-             }
-           }
+    
     stage('Package') {
       steps {
         container('docker-tools') {
