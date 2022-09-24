@@ -157,7 +157,7 @@ pipeline {
           container('docker-tools') {
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
             sh "docker pull owasp/zap2docker-weekly"
-            sh "docker run -t owasp/zap2docker-weekly zap-api-scan.py -t http://172.17.0.6:30001/v3/api-docs -f openapi"
+            sh "docker run -t owasp/zap2docker-weekly zap-api-scan.py -t http://172.17.0.4:30001/v3/api-docs -f openapi"
             }
           }
         }
