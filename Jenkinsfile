@@ -125,6 +125,13 @@ pipeline {
             }
           }
         }
+        stage('Kubesec') {
+          steps {
+            container('docker-tools') {
+              sh 'kubesec scan k8s.yaml'
+            }
+          }
+        }
       }
     }
     stage('Publish') {
